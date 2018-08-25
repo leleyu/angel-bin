@@ -26,7 +26,7 @@ class DeepFMExample extends GraphModel {
     // second order, cross operations
     val second = new BiInnerSumCross("second", embedding)
     // higher order, FC1
-    val hidden1 = new FCLayer("hidden1", 80, embedding, new Relu, new Adam(lr))
+    val hidden1 = new FCLayer("hidden1", 50, embedding, new Relu, new Adam(lr))
     // higher order, FC2
     val hidden2 = new FCLayer("hidden2", 50, hidden1, new Relu, new Adam(lr))
     // higher order, output

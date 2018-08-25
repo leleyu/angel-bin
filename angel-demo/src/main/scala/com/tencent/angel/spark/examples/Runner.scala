@@ -16,6 +16,15 @@ object Runner {
 
   PropertyConfigurator.configure("conf/log4j.properties")
 
+  def evaluate(data: RDD[LabeledData], bModel: Broadcast[GraphModel]): (Double, Double) = {
+    val scores = data.mapPartitions { case iter =>
+      val model = bModel.value
+      val output = model.forward(iter.toArray)
+      Iterator.single((output, model.graph.placeHolder.getLabel))
+    }
+    (new AUC().cal(scores), new Precision().cal(scores))
+  }
+
   def main(args: Array[String]): Unit = {
     val params = ArgsUtil.parse(args)
     val input = params.getOrElse("input", "data/census/census_148d_train.dummy")
@@ -23,7 +32,7 @@ object Runner {
     val features = params.getOrElse(MLConf.ML_FEATURE_INDEX_RANGE, "148").toInt
     val numField = params.getOrElse(MLConf.ML_FIELD_NUM, "13").toInt
     val numRank = params.getOrElse(MLConf.ML_RANK_NUM, "5").toInt
-    val numEpoch = params.getOrElse(MLConf.ML_EPOCH_NUM, "200").toInt
+    val numEpoch = params.getOrElse(MLConf.ML_EPOCH_NUM, "100").toInt
     val fraction = params.getOrElse(MLConf.ML_BATCH_SAMPLE_RATIO, "0.1").toDouble
     val lr = params.getOrElse(MLConf.ML_LEARN_RATE, "0.02").toDouble
 
@@ -83,6 +92,9 @@ object Runner {
       val loss = lossSum / data.getNumPartitions
       println(s"batch[$iteration] batchSize=$batchSize trainLoss=$loss")
     }
+
+    val (auc, precision) = evaluate(data, bModel)
+    println(s"trainAuc=$auc trainPrecision=$precision")
 
     PSContext.stop()
     sc.stop()

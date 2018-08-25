@@ -4,26 +4,27 @@
     "indexrange": 148,
     "numfield": 13,
     "validateratio": 0.1,
-    "sampleratio": 0.2
+    "sampleratio": 0.1
   },
 
   "model": {
-    "modeltype": "T_DOUBLE_SPARSE_LONGKEY",
-    "modelsize": 148
+    "modeltype": "T_FLOAT_DENSE"
   },
 
   "train": {
-    "epoch": 10,
-    "numupdateperepoch": 10,
-    "lr": 0.5,
-    "decay": 0.01
+    "epoch": 100,
+    "lr": 0.02,
+    "decay": 0.0
   },
 
-  "default_optimizer": "Momentum",
+  "default_optimizer": {
+      "type": "adam",
+      "reg2": 0.01
+  },
 
   "layers": [
     {
-      "name": "wide",
+      "name": "first",
       "type": "sparseinputlayer",
       "outputdim": 1,
       "transfunc": "identity"
@@ -31,20 +32,15 @@
     {
       "name": "embedding",
       "type": "embedding",
-      "numfactors": 8,
-      "outputdim": 104,
-      "optimizer": {
-        "type": "momentum",
-        "momentum": 0.9,
-        "reg2": 0.01
-      }
+      "numfactors": 5,
+      "outputdim": 65
     },
     {
-      "name": "fclayer",
+      "name": "higher",
       "type": "FCLayer",
       "outputdims": [
-        100,
-        100,
+        50,
+        50,
         1
       ],
       "transfuncs": [
@@ -55,26 +51,26 @@
       "inputlayer": "embedding"
     },
     {
-      "name": "biinnersumcross",
+      "name": "second",
       "type": "BiInnerSumCross",
       "inputlayer": "embedding",
       "outputdim": 1
     },
     {
-      "name": "sumPooling",
+      "name": "sum",
       "type": "SumPooling",
       "outputdim": 1,
       "inputlayers": [
-        "wide",
-        "biinnersumcross",
-        "fclayer"
+        "first",
+        "second",
+        "higher"
       ]
     },
     {
       "name": "simplelosslayer",
       "type": "simplelosslayer",
       "lossfunc": "logloss",
-      "inputlayer": "sumPooling"
+      "inputlayer": "sum"
     }
   ]
 }

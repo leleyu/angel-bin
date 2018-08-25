@@ -16,7 +16,7 @@
   },
 
   "default_optimizer": {
-    "type": "sgd",
+    "type": "adam",
     "reg2": 0.01
   },
 

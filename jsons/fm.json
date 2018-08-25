@@ -4,28 +4,27 @@
     "indexrange": 148,
     "validateratio": 0.1,
     "numfield": 13,
-    "sampleratio": 0.2
+    "sampleratio": 0.1
   },
 
   "train": {
     "epoch": 100,
-    "lr": 0.8,
-	"decay": 0.2
+    "lr": 0.02,
+    "decay":0.0
   },
 
   "model": {
-    "modeltype": "T_FLOAT_DENSE",
-    "modelsize": 148
+    "modeltype": "T_FLOAT_DENSE"
   },
 
   "default_optimizer": {
-    "type": "momentum",
+    "type": "adam",
     "reg2": 0.01
   },
 
   "layers": [
     {
-      "name": "wide",
+      "name": "first",
       "type": "sparseinputlayer",
       "outputdim": 1,
       "transfunc": "identity"
@@ -33,29 +32,29 @@
     {
       "name": "embedding",
       "type": "embedding",
-      "numfactors": 8,
-      "outputdim": 104
+      "numfactors": 5,
+      "outputdim": 65
     },
     {
-      "name": "biinnersumcross",
+      "name": "second",
       "type": "BiInnerSumCross",
       "inputlayer": "embedding",
       "outputdim": 1
     },
     {
-      "name": "sumPooling",
+      "name": "sum",
       "type": "SumPooling",
       "outputdim": 1,
       "inputlayers": [
-        "wide",
-        "biinnersumcross"
+        "first",
+        "second"
       ]
     },
     {
       "name": "simplelosslayer",
       "type": "simplelosslayer",
       "lossfunc": "logloss",
-      "inputlayer": "sumPooling"
+      "inputlayer": "sum"
     }
   ]
 }

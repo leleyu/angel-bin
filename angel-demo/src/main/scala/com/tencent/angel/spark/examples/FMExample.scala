@@ -11,7 +11,6 @@ import com.tencent.angel.ml.core.optimizer.loss.LogLoss
 import com.tencent.angel.spark.ml.core.GraphModel
 
 
-
 class FMExample extends GraphModel {
 
   val lr = conf.getDouble(MLConf.ML_LEARN_RATE)
@@ -20,10 +19,15 @@ class FMExample extends GraphModel {
 
   override
   def network(): Unit = {
-    val wide = new SparseInputLayer("wide", 1, new Identity(), new Adam(lr))
+    // first order, inputlayer
+    val first = new SparseInputLayer("first", 1, new Identity(), new Adam(lr))
+    // embedding 
     val embedding = new Embedding("embedding", numField * numFactor, numFactor, new Adam(lr))
-    val crossFeature = new BiInnerSumCross("innerSumPooling", embedding)
-    val sum = new SumPooling("sum", 1, Array(wide, crossFeature))
-    new SimpleLossLayer("simpleLossLayer", sum, new LogLoss)
+    //  second order, cross operations
+    val second = new BiInnerSumCross("second", embedding)
+    // sum first and second
+    val sum = new SumPooling("sum", 1, Array(first, second))
+    // losslayer
+    new SimpleLossLayer("loss", sum, new LogLoss)
   }
 }

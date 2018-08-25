@@ -13,19 +13,28 @@ import com.tencent.angel.spark.ml.core.GraphModel
 
 class DeepFMExample extends GraphModel {
 
-  val numFields: Int = SharedConf.get().getInt(MLConf.ML_FIELD_NUM)
-  val numFactors: Int = SharedConf.get().getInt(MLConf.ML_RANK_NUM)
+  val numField: Int = SharedConf.get().getInt(MLConf.ML_FIELD_NUM)
+  val numFactor: Int = SharedConf.get().getInt(MLConf.ML_RANK_NUM)
   val lr: Double = SharedConf.get().getDouble(MLConf.ML_LEARN_RATE)
 
   override
   def network(): Unit = {
-    val wide = new SparseInputLayer("input", 1, new Identity(), new Adam(lr))
-    val embedding = new Embedding("embedding", numFields*numFactors, numFactors, new Adam(lr))
-    val innerSumCross = new BiInnerSumCross("innerSumPooling", embedding)
+    // first order, input layer
+    val first = new SparseInputLayer("first", 1, new Identity(), new Adam(lr))
+    // embedding
+    val embedding = new Embedding("embedding", numField * numFactor, numFactor, new Adam(lr))
+    // second order, cross operations
+    val second = new BiInnerSumCross("second", embedding)
+    // higher order, FC1
     val hidden1 = new FCLayer("hidden1", 80, embedding, new Relu, new Adam(lr))
+    // higher order, FC2
     val hidden2 = new FCLayer("hidden2", 50, hidden1, new Relu, new Adam(lr))
-    val mlpLayer = new FCLayer("hidden3", 1, hidden2, new Identity, new Adam(lr))
-    val join = new SumPooling("sumPooling", 1, Array[Layer](wide, innerSumCross, mlpLayer))
-    new SimpleLossLayer("simpleLossLayer", join, new LogLoss)
+    // higher order, output
+    val higher  = new FCLayer("higher", 1, hidden2, new Identity, new Adam(lr))
+    // sum, first + second + higher
+    val sum = new SumPooling("sum", 1, Array[Layer](first, second, higher))
+    // losslayer, logloss
+    new SimpleLossLayer("loss", sum, new LogLoss)
+
   }
 }

@@ -2,7 +2,7 @@
   "data": {
     "format": "dummy",
     "indexrange": 148,
-    "validateratio": 0.1,
+    "validateratio": 0.0,
     "numfield": 13,
     "sampleratio": 0.1
   },

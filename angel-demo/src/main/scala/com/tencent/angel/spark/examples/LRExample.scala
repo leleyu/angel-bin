@@ -20,6 +20,6 @@ class LRExample extends GraphModel {
     // inputlayer
 
     // losslayer
-    
+
   }
 }

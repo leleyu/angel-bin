@@ -26,15 +26,15 @@ class DeepFMExample extends GraphModel {
     // second order, cross operations
     val second = new BiInnerSumCross("second", embedding)
     // higher order, FC1
-    val hidden1 = new FCLayer("hidden1", 50, embedding, new Relu, new Adam(lr))
+
     // higher order, FC2
-    val hidden2 = new FCLayer("hidden2", 50, hidden1, new Relu, new Adam(lr))
+
     // higher order, output
-    val higher  = new FCLayer("higher", 1, hidden2, new Identity, new Adam(lr))
+
     // sum, first + second + higher
-    val sum = new SumPooling("sum", 1, Array[Layer](first, second, higher))
+    // val sum = new SumPooling("sum", 1, Array[Layer](first, second, higher))
     // losslayer, logloss
-    new SimpleLossLayer("loss", sum, new LogLoss)
+    // new SimpleLossLayer("loss", sum, new LogLoss)
 
   }
 }

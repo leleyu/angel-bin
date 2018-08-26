@@ -18,9 +18,8 @@ class LRExample extends GraphModel {
   override
   def network(): Unit = {
     // inputlayer
-    val input = new SparseInputLayer("input", 1, new Identity, new SGD(lr))
 
     // losslayer
-    new SimpleLossLayer("loss", input, new LogLoss)   
+    
   }
 }

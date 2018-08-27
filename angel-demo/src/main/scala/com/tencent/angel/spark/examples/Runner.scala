@@ -78,6 +78,7 @@ object Runner {
     for (iteration <- 1 to numEpoch) {
       val (lossSum, batchSize) = data.sample(false, fraction, 42 + iteration)
         .mapPartitions { case iter =>
+          // build connections with servers for each executor
           PSClient.instance()
           val samples = iter.toArray
           bModel.value.forward(samples)

@@ -22,12 +22,12 @@ class FMExample extends GraphModel {
     // first order, inputlayer
     val first = new SparseInputLayer("first", 1, new Identity(), new Adam(lr))
     // embedding 
-    
+    val embedding = new Embedding("embedding", numField* numFactor, numFactor, new Adam(lr))
     // second order, cross operations
-    
+    val second = new BiInnerSumCross("second", embedding)
     // sum first and second
-    
+    val sum = new SumPooling("sum", 1, Array(first, second))
     // losslayer
-    // new SimpleLossLayer("loss", sum, new LogLoss)
+    new SimpleLossLayer("loss", sum, new LogLoss)
   }
 }
